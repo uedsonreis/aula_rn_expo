@@ -1,11 +1,13 @@
 import React from 'react'
-import MapView from 'react-native-maps'
 import * as Location from 'expo-location'
 import { StyleSheet, View } from 'react-native'
+import MapView, { LongPressEvent } from 'react-native-maps'
+import { NavigationProp, useNavigation } from '@react-navigation/native'
 
 export default function MapPage() {
 
-    const [location, setLocation] = React.useState<Location.LocationObject>();
+    const navigation = useNavigation<NavigationProp<any>>()
+    const [location, setLocation] = React.useState<Location.LocationObject>()
 
     async function getGeoLocation() {
         let { status } = await Location.requestForegroundPermissionsAsync()
@@ -18,11 +20,16 @@ export default function MapPage() {
         getGeoLocation()
     }, [])
 
+    function goToPlace(event: LongPressEvent) {
+        navigation.navigate('Place', event.nativeEvent.coordinate)
+    }
+
     return (
         <View style={styles.container}>
             <MapView
                 style={styles.map}
                 showsUserLocation={true}
+                onLongPress={goToPlace}
                 initialCamera={location && {
                     center: {
                         latitude: location.coords.latitude,
