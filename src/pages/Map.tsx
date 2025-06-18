@@ -1,13 +1,18 @@
 import React from 'react'
 import * as Location from 'expo-location'
 import { StyleSheet, View } from 'react-native'
-import MapView, { LongPressEvent } from 'react-native-maps'
-import { NavigationProp, useNavigation } from '@react-navigation/native'
+import MapView, { LongPressEvent, Marker } from 'react-native-maps'
+import { NavigationProp, useFocusEffect, useNavigation } from '@react-navigation/native'
+
+import { placeRepo } from '../services/place.repo'
+import { Place } from '../models/place'
 
 export default function MapPage() {
 
     const navigation = useNavigation<NavigationProp<any>>()
     const [location, setLocation] = React.useState<Location.LocationObject>()
+
+    const [places, setPlaces] = React.useState<Place[]>([])
 
     async function getGeoLocation() {
         let { status } = await Location.requestForegroundPermissionsAsync()
@@ -19,6 +24,10 @@ export default function MapPage() {
     React.useEffect(() => {
         getGeoLocation()
     }, [])
+
+    useFocusEffect(() => {
+        placeRepo.getPlaces().then(list => setPlaces(list))
+    })
 
     function goToPlace(event: LongPressEvent) {
         navigation.navigate('Place', event.nativeEvent.coordinate)
@@ -40,7 +49,15 @@ export default function MapPage() {
                     zoom: 15
                 }}
             >
-
+                { places.map(place => (
+                    <Marker
+                        title={place.name}
+                        coordinate={{
+                            latitude:place.latitude,
+                            longitude: place.longitude
+                        }}
+                    />
+                )) }
             </MapView>
         </View>
     );

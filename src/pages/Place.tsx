@@ -1,11 +1,14 @@
-import { useRoute } from "@react-navigation/native"
+import { NavigationProp, useNavigation, useRoute } from "@react-navigation/native"
 import { Alert, Button, StyleSheet, TextInput, Text, View } from "react-native"
 import { LatLng } from "react-native-maps"
+
+import { placeRepo } from '../services/place.repo'
 
 export default function PlacePage() {
 
     const route = useRoute()
     const params = route.params as LatLng
+    const navigation = useNavigation<NavigationProp<any>>()
 
     let name = ''
     let description = ''
@@ -14,8 +17,16 @@ export default function PlacePage() {
         if (!name && name.trim() === '') {
             Alert.alert('O Nome é obrigatório!')
         }
-        console.log('Nome: ', name)
-        console.log('Desc: ', description)
+
+        const place = {
+            name, description,
+            latitude: params.latitude,
+            longitude: params.longitude,
+        }
+    
+        placeRepo.save(place).then(() => {
+            navigation.goBack()
+        })
     }
 
     return (
@@ -60,11 +71,13 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
     },
     inputDescription: {
+        height: 140,
         borderWidth: 1,
         borderRadius: 3,
         marginVertical:10,
         marginHorizontal: 20,
         textAlign: "justify",
+        textAlignVertical: "top",
     },
     button: {
         marginTop: 30,
