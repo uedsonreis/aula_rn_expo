@@ -10,6 +10,10 @@ class PlaceRepository {
         await AsyncStorage.setItem(PlaceRepository.KEY, JSON.stringify(list))
     }
 
+    private equals(p1: Place, p2: Place) {
+        return p1.latitude === p2.latitude && p1.longitude === p2.longitude
+    }
+
     public async getPlaces() {
         const json = await AsyncStorage.getItem(PlaceRepository.KEY)
         if (json) return JSON.parse(json) as Place[]
@@ -18,7 +22,22 @@ class PlaceRepository {
 
     public async save(place: Place) {
         const list = await this.getPlaces()
-        list.push(place)
+
+        const finded = list.find(p => this.equals(p, place))
+        if (finded) {
+            finded.name = place.name
+            finded.description = place.description
+        } else {
+            list.push(place)
+        }
+
+        this.persist(list)
+    }
+
+    public async remove(place: Place) {
+        let list = await this.getPlaces()
+        list = list.filter(p => !this.equals(p, place))
+
         this.persist(list)
     }
 

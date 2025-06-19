@@ -1,17 +1,33 @@
-import { NavigationProp, useNavigation, useRoute } from "@react-navigation/native"
+import React from "react"
 import { Alert, Button, StyleSheet, TextInput, Text, View } from "react-native"
-import { LatLng } from "react-native-maps"
+import { NavigationProp, useNavigation, useRoute } from "@react-navigation/native"
 
 import { placeRepo } from '../services/place.repo'
+import { Place } from "../models/place"
 
 export default function PlacePage() {
 
     const route = useRoute()
-    const params = route.params as LatLng
+    const params = route.params as Place
     const navigation = useNavigation<NavigationProp<any>>()
 
-    let name = ''
-    let description = ''
+    const [name, setName] = React.useState(params.name ? params.name : '')
+    const [description, setDescription] = React.useState(params.description ? params.description : '')
+
+    React.useEffect(() => {
+        if (params.name) navigation.setOptions({ title: 'Edição Lugar' })
+    },[])
+
+    function remove() {
+        const place = {
+            latitude: params.latitude,
+            longitude: params.longitude
+        }
+
+        placeRepo.remove(place).then(() => {
+            navigation.goBack()
+        })
+    }
 
     function save() {
         if (!name && name.trim() === '') {
@@ -37,14 +53,22 @@ export default function PlacePage() {
             <Text style={styles.label}>Informe os dados do novo local:</Text>
 
             <TextInput
+                value={name}
                 style={styles.inputName}
-                placeholder="Nome" onChangeText={value => name = value}
+                placeholder="Nome" onChangeText={setName}
             />
 
             <TextInput
+                value={description}
                 style={styles.inputDescription} numberOfLines={10} multiline
-                placeholder="Descrição" onChangeText={value => description = value}
+                placeholder="Descrição" onChangeText={setDescription}
             />
+
+            { params.name && (
+                <View style={styles.button}>
+                    <Button title="Remover" onPress={remove} color='red' />
+                </View>
+            ) }
 
             <View style={styles.button}>
                 <Button title="Salvar" onPress={save} />

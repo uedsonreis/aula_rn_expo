@@ -29,8 +29,12 @@ export default function MapPage() {
         placeRepo.getPlaces().then(list => setPlaces(list))
     })
 
-    function goToPlace(event: LongPressEvent) {
+    function goToNewPlace(event: LongPressEvent) {
         navigation.navigate('Place', event.nativeEvent.coordinate)
+    }
+
+    function goToEditPlace(place: Place) {
+        navigation.navigate('Place', place)
     }
 
     return (
@@ -38,7 +42,7 @@ export default function MapPage() {
             <MapView
                 style={styles.map}
                 showsUserLocation={true}
-                onLongPress={goToPlace}
+                onLongPress={goToNewPlace}
                 initialCamera={location && {
                     center: {
                         latitude: location.coords.latitude,
@@ -51,11 +55,13 @@ export default function MapPage() {
             >
                 { places.map(place => (
                     <Marker
+                        key={`${place.latitude}-${place.longitude}`}
                         title={place.name}
                         coordinate={{
                             latitude:place.latitude,
                             longitude: place.longitude
                         }}
+                        onPress={() => goToEditPlace(place)}
                     />
                 )) }
             </MapView>
