@@ -13,7 +13,7 @@ const Stack = createNativeStackNavigator()
 function MapStack() {
     return (
         <Stack.Navigator>
-            <Stack.Screen name='Map' component={MapPage} options={{ headerShown: false }} />
+            <Stack.Screen name='Map' component={MapPage} options={{ headerShown: false, title: 'Mapa' }} />
             <Stack.Screen name='Place' component={PlacePage} options={{ title: 'Lugar Novo' }} />
         </Stack.Navigator>
     )
@@ -21,7 +21,10 @@ function MapStack() {
 
 function ListStack() {
     return (
-        <ListPage />
+        <Stack.Navigator>
+            <Stack.Screen name='List' component={ListPage} options={{ title: 'Lista' }} />
+            <Stack.Screen name='Place' component={PlacePage} options={{ title: 'Lugar Novo' }} />
+        </Stack.Navigator>
     )
 }
 

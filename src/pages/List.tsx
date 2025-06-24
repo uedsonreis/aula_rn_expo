@@ -1,25 +1,36 @@
 import React from 'react'
-import { FlatList, View, Text } from "react-native"
+import { FlatList, View } from "react-native"
+import { NavigationProp, useFocusEffect, useNavigation } from '@react-navigation/native'
 
 import { Place } from '../models/place'
-import { placeRepo } from '../services/place.repo'
-import { useFocusEffect } from '@react-navigation/native'
 import ListItem from '../components/ListItem'
+import { placeRepo } from '../services/place.repo'
 
 export default function ListPage() {
 
+    const navigation = useNavigation<NavigationProp<any>>()
     const [places, setPlaces] = React.useState<Place[]>([])
 
     useFocusEffect(() => {
         placeRepo.getPlaces().then(list => setPlaces(list))
     })
 
+    function goToEditPlace(place: Place) {
+        navigation.navigate('Place', place)
+    }
+
     return (
-        <View style={{ marginTop: 40 }}>
+        <View>
             <FlatList
                 data={places}
                 keyExtractor={place => `${place.latitude}-${place.longitude}`}
-                renderItem={({ item }) => <ListItem title={item.name!} description={item.description} />}
+                renderItem={({ item }) => (
+                    <ListItem
+                        title={item.name!}
+                        description={item.description}
+                        onPress={() => goToEditPlace(item)}
+                    />
+                )}
             />
         </View>
     )

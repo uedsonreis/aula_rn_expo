@@ -1,13 +1,15 @@
 import { StyleSheet, View, Text } from 'react-native'
+import { Place } from '../models/place'
 
 type Props = {
     title: string
     description?: string
+    onPress: () => void
 }
 
 export default function ListItem(props: Props) {
     return (
-        <View style={styles.container}>
+        <View style={styles.container} onTouchEnd={props.onPress}>
             <Text style={styles.title}>{props.title}</Text>
             { props.description && (
                 <Text style={styles.description}>{props.description}</Text>
